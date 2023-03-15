@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: my-argo-workflow-sensor
+spec:
+  template:
+    serviceAccountName: operate-workflow-sa
+  dependencies:
+    - name: payload-from-event
+      eventSourceName: my-event-source
+      eventName: my-webhook-event
+  triggers:
+    - template:
+        name: my-argo-workflow
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: my-parallel-workflow-
+              spec:
+                ttlStrategy:
+                  secondsAfterCompletion: 10
+                  secondsAfterSuccess: 5
+                  secondsAfterFailure: 5
+                entrypoint: my-workflow
+                templates:
+                  - name: my-workflow
+                    steps:
+                      - - name: echo-task
+                          template: template-echo
+                      - - name: ls-task
+                          template: template-ls
+                      - - name: sleep-task-a
+                          template: template-sleep
+                        - name: sleep-task-b
+                          template: template-sleep
+                      - - name: delay-task
+                          template: template-delay
+                      - - name: sleep-task-c
+                          template: template-sleep
+                  - name: template-echo
+                    container:
+                      image: alpine
+                      command: ["echo"]
+                      args: ["Input::\n", ""]
+                  - name: template-ls
+                    container:
+                      image: alpine
+                      command: [ls]
+                      args: ["-l"]
+                  - name: template-sleep
+                    script:
+                      image: alpine
+                      command: [sleep]
+                      args: ["10"]
+                  - name: template-delay
+                    suspend:
+                      duration: "60s"
+          parameters:
+            - src:
+                dependencyName: payload-from-event
+                dataKey: body.message
+              dest: spec.templates.1.container.args.1
