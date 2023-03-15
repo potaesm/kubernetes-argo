@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: my-event-source
+spec:
+  service:
+    ports:
+      - port: 4321
+        targetPort: 4321
+  webhook:
+    my-webhook-event:
+      port: "4321"
+      endpoint: /webhook
+      method: POST

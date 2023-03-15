@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: my-sensor
+spec:
+  template:
+    serviceAccountName: argo-events-sa
+  dependencies:
+    - name: payload-from-event
+      eventSourceName: my-event-source
+      eventName: my-webhook-event
+  triggers:
+    - template:
+        name: payload-from-event
+        k8s:
+          group: ""
+          version: v1
+          resource: pods
+          operation: create
+          source:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                generateName: print-payload-pod-
+                labels:
+                  app: print-payload-app
+              spec:
+                containers:
+                  - name: print-payload-container
+                    image: alpine
+                    command: ["echo"]
+                    args: ["Input::\n", ""]
+                restartPolicy: Never
+          parameters:
+            - src:
+                dependencyName: payload-from-event
+                dataKey: body.message
+              dest: spec.containers.0.args.1
