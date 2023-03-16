@@ -1,6 +1,8 @@
 # Argo on Kubernetes
 
 - [Argo Workflow](https://argoproj.github.io/argo-events/sensors/triggers/argo-workflow/)
+- [Argo EventSource Services](https://argoproj.github.io/argo-events/eventsources/services/)
+- [Kubernetes Ingress with TLS/SSL](https://github.com/HoussemDellai/kubernetes-ingress-tls-ssl-https)
 
 ## Delete namespace
 
@@ -93,4 +95,43 @@ kubectl --namespace argo-events logs {PodName}
 
 ```bash
 pkill kubectl -9
+```
+
+## Ingress
+
+### Delete ingress class
+
+```bash
+kubectl get ingressClasses
+kubectl delete ingressClasses nginx
+kubectl get validatingwebhookconfigurations 
+kubectl delete validatingwebhookconfigurations {ConfigurationName}
+helm delete app-ingress --namespace ingress
+kubectl delete namespace ingress
+```
+
+### Add the Helm chart for Nginx ingress
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install my-argo-events-ingress ingress-nginx/ingress-nginx \
+     --namespace ingress \
+     --create-namespace \
+     --set controller.replicaCount=2 \
+     --set controller.nodeSelector."kubernetes\.io/os"=linux \
+     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux
+```
+
+### Check availability
+
+```bash
+kubectl get services --namespace ingress
+```
+
+### Create argo events ingress
+
+```bash
+kubectl apply --filename argo-events-ingress.yaml
+kubectl get ingress -A
 ```

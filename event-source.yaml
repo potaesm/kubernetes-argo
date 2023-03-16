@@ -3,12 +3,25 @@ kind: EventSource
 metadata:
   name: my-event-source
 spec:
-  service:
-    ports:
-      - port: 4321
-        targetPort: 4321
+  # service:
+  #   ports:
+  #     - port: 4321
+  #       targetPort: 4321
   webhook:
     my-webhook-event:
       port: "4321"
       endpoint: /webhook
       method: POST
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-webhook-event-source-svc
+spec:
+  ports:
+  - port: 4321
+    protocol: TCP
+    targetPort: 4321
+  selector:
+    eventsource-name: my-event-source
+  type: ClusterIP # NodePort

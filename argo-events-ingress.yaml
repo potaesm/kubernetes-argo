@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-argo-events-ingress
+  namespace: argo-events
+  annotations:
+    ingressClassName: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /events(/|$)(.*)
+            backend:
+              service:
+                name: my-webhook-event-source-svc
+                port:
+                  number: 4321
+    - host: myargoevents.20.239.30.123.nip.io # ingress nginx controller external IP
+      http:
+        paths:
+          - pathType: Prefix
+            path: /events
+            backend:
+              service:
+                name: my-webhook-event-source-svc
+                port:
+                  number: 4321
