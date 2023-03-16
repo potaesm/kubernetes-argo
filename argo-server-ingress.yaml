@@ -1,25 +1,26 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: my-argo-events-ingress
-  namespace: argo-events
+  name: my-argo-server-ingress
+  namespace: argo
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false" # "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/backend-protocol: https
 spec:
   ingressClassName: nginx
   rules:
-    - host: argo.cortexshiftdev.team # myargoevents.<ingress-nginx-controller-external-ip>.nip.io
+    - host: argo.cortexshiftdev.team # myargoserver.<ingress-nginx-controller-external-ip>.nip.io
       http:
         paths:
-          - path: /events(/|$)(.*)
+          - path: /argo(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: my-webhook-event-source-svc
+                name: argo-server
                 port:
-                  number: 4321
+                  number: 2746
 #   tls:
 #     - hosts:
 #         - argo.cortexshiftdev.team
@@ -29,7 +30,7 @@ spec:
 # kind: Secret
 # metadata:
 #   name: my-tls-secret
-#   namespace: argo-events
+#   namespace: argo
 # data:
 #   tls.crt: ""
 #   tls.key: ""
