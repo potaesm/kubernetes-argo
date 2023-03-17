@@ -3,6 +3,7 @@
 - [Argo Workflow](https://argoproj.github.io/argo-events/sensors/triggers/argo-workflow/)
 - [Argo EventSource Services](https://argoproj.github.io/argo-events/eventsources/services/)
 - [Kubernetes Ingress with TLS/SSL](https://github.com/HoussemDellai/kubernetes-ingress-tls-ssl-https)
+- [SSL/TLS for your Kubernetes Cluster with Cert-Manager](https://towardsdatascience.com/ssl-tls-for-your-kubernetes-cluster-with-cert-manager-3db24338f17)
 
 ## Force delete namespace
 
@@ -147,6 +148,15 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
 ```bash
 kubectl get services --namespace ingress
 kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-nginx-controller
+```
+
+#### Generate TLS certificate
+
+```bash
+kubectl create ns cert-manager
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+kubectl apply -f letsencrypt.yaml --namespace cert-manager
+kubectl get secrets -n cert-manager
 ```
 
 #### Create argo events ingress

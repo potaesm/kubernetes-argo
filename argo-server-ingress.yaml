@@ -21,10 +21,10 @@ spec:
                 name: argo-server
                 port:
                   number: 2746
-#   tls:
-#     - hosts:
-#         - argo.cortexshiftdev.team
-#       secretName: my-tls-secret
+  tls:
+    - hosts:
+        - argo.cortexshiftdev.team
+      secretName: tls-cert-secret
 # ---
 # apiVersion: v1
 # kind: Secret
