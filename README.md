@@ -139,7 +139,7 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
 # kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
 #     --namespace ingress \
 #     --type='json' \
-#     --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate=argo-events/my-tls-secret"}]'
+#     --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate=argo-events/tls-cert-secret"}]'
 # kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
