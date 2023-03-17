@@ -143,6 +143,7 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
 ```bash
 kubectl get services --namespace ingress
 kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-nginx-controller
+# Prepare DNS record with the nginx ingress external IP
 ```
 
 #### Generate TLS certificate
