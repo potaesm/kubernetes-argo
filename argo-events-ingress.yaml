@@ -4,7 +4,7 @@ metadata:
   name: my-argo-events-ingress
   namespace: argo-events
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false" # "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
@@ -20,17 +20,7 @@ spec:
                 name: my-webhook-event-source-svc
                 port:
                   number: 4321
-#   tls:
-#     - hosts:
-#         - argo.cortexshiftdev.team
-#       secretName: my-tls-secret
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: my-tls-secret
-#   namespace: argo-events
-# data:
-#   tls.crt: ""
-#   tls.key: ""
-# type: kubernetes.io/tls
+  tls:
+    - hosts:
+        - argo.cortexshiftdev.team
+      secretName: tls-cert-secret

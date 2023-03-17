@@ -136,11 +136,6 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
-# kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
-#     --namespace ingress \
-#     --type='json' \
-#     --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate=argo-events/tls-cert-secret"}]'
-# kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
 #### Check ingress availability
@@ -155,9 +150,20 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 ```bash
 kubectl create ns cert-manager
 kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
-kubectl apply --filename letsencrypt.yaml --namespace cert-manager
-kubectl get secrets --namespace cert-manager
-kubectl describe secrets tls-cert-secret --namespace cert-manager
+kubectl apply --filename letsencrypt.yaml --namespace {TargetIngressNamespace}
+kubectl get secrets --namespace {TargetIngressNamespace}
+kubectl describe secrets tls-cert-secret --namespace {TargetIngressNamespace}
+kubectl --namespace {TargetIngressNamespace} get secret tls-cert-secret -ojson | jq -r '.data."tls.crt"' | base64 -d | openssl x509 -dates -noout -issuer
+```
+
+#### (Optional) Force Nginx ingress to use the generated certificate path
+
+```bash
+kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
+    --namespace ingress \
+    --type='json' \
+    --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate={TargetIngressNamespace}/tls-cert-secret"}]'
+# kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
 #### Create argo events ingress
