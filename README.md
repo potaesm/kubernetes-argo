@@ -154,9 +154,10 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 
 ```bash
 kubectl create ns cert-manager
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
-kubectl apply -f letsencrypt.yaml --namespace cert-manager
-kubectl get secrets -n cert-manager
+kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+kubectl apply --filename letsencrypt.yaml --namespace cert-manager
+kubectl get secrets --namespace cert-manager
+kubectl describe secrets tls-cert-secret --namespace cert-manager
 ```
 
 #### Create argo events ingress
