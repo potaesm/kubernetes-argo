@@ -21,6 +21,11 @@ spec:
               metadata:
                 generateName: my-parallel-workflow-
               spec:
+                synchronization:
+                  semaphore:
+                    configMapKeyRef:
+                      name: my-workflow-config
+                      key: workflow
                 ttlStrategy:
                   secondsAfterCompletion: 10
                   secondsAfterSuccess: 5
@@ -64,3 +69,11 @@ spec:
                 dependencyName: payload-from-event
                 dataKey: body.message
               dest: spec.templates.1.container.args.1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-workflow-config
+data:
+  workflow: "3" # Only three workflow can run at given time in particular namespace
+  template: "1" # One instances of template can run at a given time in particular namespace
