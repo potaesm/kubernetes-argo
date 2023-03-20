@@ -1,9 +1,42 @@
 # Argo on Kubernetes
 
+## Useful links
+
 - [Argo Workflow](https://argoproj.github.io/argo-events/sensors/triggers/argo-workflow/)
 - [Argo EventSource Services](https://argoproj.github.io/argo-events/eventsources/services/)
 - [Kubernetes Ingress with TLS/SSL](https://github.com/HoussemDellai/kubernetes-ingress-tls-ssl-https)
 - [SSL/TLS for your Kubernetes Cluster with Cert-Manager](https://towardsdatascience.com/ssl-tls-for-your-kubernetes-cluster-with-cert-manager-3db24338f17)
+
+## Contents
+
+- [Force delete namespace](#force-delete-namespace)
+- [Argo](#argo)
+  - [Setup the Argo server](#setup-the-argo-server)
+    - [Argo server installation](#argo-server-installation)
+    - [Argo server port forward](#argo-server-port-forward)
+  - [Setup the Argo events](#setup-the-argo-events)
+    - [Setup the "operate-workflow-sa" service account name](#setup-the-operate-workflow-sa-service-account-name)
+    - [Setup the event bus](#setup-the-event-bus)
+    - [Apply the event source](#apply-the-event-source)
+    - [Check argo events availability](#check-argo-events-availability)
+    - [Argo events port forward](#argo-events-port-forward)
+  - [Sensors](#sensors)
+    - [Apply the sensor](#apply-the-sensor)
+    - [Check sensors availability](#check-sensors-availability)
+  - [Create events](#create-events)
+    - [Make a request to webhook](#make-a-request-to-webhook)
+    - [Check event results](#check-event-results)
+- [Kill the network](#kill-the-network)
+- [Ingress](#ingress)
+  - [Delete the existing ingress class](#delete-the-existing-ingress-class)
+  - [Install the Nginx ingress](#install-the-nginx-ingress)
+  - [Check ingress availability](#check-ingress-availability)
+  - [Generate TLS certificates](#generate-tls-certificates)
+  - [(Optional) Force Nginx ingress to use the generated certificate path](#optional-force-nginx-ingress-to-use-the-generated-certificate-path)
+  - [Create argo events ingress](#create-argo-events-ingress)
+- [Authentication](#authentication)
+  - [Change auth mode](#change-auth-mode)
+  - [Service account role binding](#service-account-role-binding)
 
 ## Force delete namespace
 
@@ -19,12 +52,19 @@ kubectl get ns {TargetNamespace} -o json | jq '.spec.finalizers=[]' | curl -X PU
 
 ### Setup the Argo server
 
+#### Argo server installation
+
 ```bash
 kubectl create namespace argo
 kubectl apply --namespace argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.5/install.yaml
 # kubectl delete --namespace argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.5/install.yaml
 kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["server", "--auth-mode=server"]}]'
 kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/env", "value": [{"name": "BASE_HREF", "value": "/argo/"}]}]'
+```
+
+#### Argo server port forward
+
+```bash
 kubectl --namespace argo port-forward deployment/argo-server 2746:2746
 ```
 
@@ -49,15 +89,13 @@ kubectl apply -n argo-events -f https://raw.githubusercontent.com/argoproj/argo-
 kubectl --namespace argo-events apply --filename https://raw.githubusercontent.com/argoproj/argo-events/stable/examples/eventbus/native.yaml
 ```
 
-## Event source
-
-### Apply the event source
+#### Apply the event source
 
 ```bash
 kubectl --namespace argo-events apply --filename event-source.yaml
 ```
 
-### Check availability
+#### Check argo events availability
 
 ```bash
 kubectl --namespace argo-events get eventsources
@@ -68,36 +106,36 @@ kubectl --namespace argo-events get pods
 # kubectl --namespace argo-events delete pods {PodName}
 ```
 
-### Port forward
+#### Argo events port forward
 
 ```bash
 kubectl --namespace argo-events port-forward $(kubectl --namespace argo-events get pods --output name --selector eventsource-name={EventSourceName}) 4321:4321
 ```
 
-## Sensor
+### Sensors
 
-### Apply the sensor
+#### Apply the sensor
 
 ```bash
 kubectl --namespace argo-events apply --filename {SensorFileName}.yaml
 ```
 
-### Check availability
+#### Check sensors availability
 
 ```bash
 kubectl --namespace argo-events get sensors
 # kubectl --namespace argo-events delete sensors {SensorName}
 ```
 
-## Create event
+### Create events
 
-### Make a request to webhook
+#### Make a request to webhook
 
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"message":"Suthinan Musitmani"}' http://localhost:4321/webhook
 ```
 
-### Check results
+#### Check event results
 
 ```bash
 kubectl --namespace argo-events get pods
@@ -113,7 +151,7 @@ pkill kubectl -9
 
 ## Ingress
 
-#### Delete the existing ingress class
+### Delete the existing ingress class
 
 ```bash
 kubectl get validatingwebhookconfigurations
@@ -124,7 +162,7 @@ kubectl delete ingressClasses nginx
 kubectl delete namespace ingress
 ```
 
-#### Install the Nginx ingress
+### Install the Nginx ingress
 
 ```bash
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -138,7 +176,7 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
 ```
 
-#### Check ingress availability
+### Check ingress availability
 
 ```bash
 kubectl get services --namespace ingress
@@ -146,7 +184,7 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 # Prepare DNS record with the nginx ingress external IP
 ```
 
-#### Generate TLS certificate
+### Generate TLS certificates
 
 ```bash
 kubectl create namespace cert-manager
@@ -157,7 +195,7 @@ kubectl describe secrets tls-cert-secret --namespace {TargetIngressNamespace}
 kubectl --namespace {TargetIngressNamespace} get secret tls-cert-secret -ojson | jq -r '.data."tls.crt"' | base64 -d | openssl x509 -dates -noout -issuer
 ```
 
-#### (Optional) Force Nginx ingress to use the generated certificate path
+### (Optional) Force Nginx ingress to use the generated certificate path
 
 ```bash
 kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
@@ -167,10 +205,26 @@ kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
 # kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
-#### Create argo events ingress
+### Create argo events ingress
 
 ```bash
 kubectl apply --filename argo-server-ingress.yaml
 kubectl apply --filename argo-events-ingress.yaml
 kubectl get ingress -A
+```
+
+## Authentication
+
+### Change auth mode
+
+```bash
+kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["server", "--auth-mode=client"]}]'
+```
+
+### Service account role binding
+
+```bash
+kubectl apply --filename role-binding.yaml
+kubectl apply --filename token.yaml --namespace argo
+echo "Bearer $(kubectl get secret argo-server.service-account-token --namespace argo -o=jsonpath='{.data.token}' | base64 --decode)"
 ```
