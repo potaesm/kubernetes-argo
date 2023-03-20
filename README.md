@@ -35,8 +35,12 @@
   - [(Optional) Force Nginx ingress to use the generated certificate path](#optional-force-nginx-ingress-to-use-the-generated-certificate-path)
   - [Create argo events ingress](#create-argo-events-ingress)
 - [Authentication](#authentication)
-  - [Change auth mode](#change-auth-mode)
-  - [Service account role binding](#service-account-role-binding)
+  - [Argo server authentication](#argo-server-authentication)
+    - [Change auth mode](#change-auth-mode)
+    - [Service account role binding](#service-account-role-binding)
+  - [Webhook authentication](#webhook-authentication)
+    - [Create the token secret](#create-the-token-secret)
+    - [Apply the auth secret](#apply-the-auth-secret)
 
 ## Force delete namespace
 
@@ -233,9 +237,16 @@ echo "Bearer $(kubectl get secret argo-server.service-account-token --namespace 
 
 ### Webhook authentication
 
+#### Create the token secret
+
 ```bash
 echo -n "$(kubectl get secret argo-server.service-account-token -n argo -o=jsonpath='{.data.token}' | base64 --decode)" > ./webhook-token.txt
 kubectl --namespace argo-events create secret generic my-webhook-token --from-file=my-token=./webhook-token.txt
+```
+
+#### Apply the auth secret
+
+```bash
 # Enable authSecret at the webhook event source
 kubectl --namespace argo-events apply --filename event-source.yaml
 ```
