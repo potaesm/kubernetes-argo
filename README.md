@@ -215,16 +215,27 @@ kubectl get ingress -A
 
 ## Authentication
 
-### Change auth mode
+### Argo server authentication
+
+#### Change auth mode
 
 ```bash
 kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["server", "--auth-mode=client"]}]'
 ```
 
-### Service account role binding
+#### Service account role binding
 
 ```bash
 kubectl apply --filename role-binding.yaml
-kubectl apply --filename token.yaml --namespace argo
+kubectl apply --filename argo-server-token.yaml --namespace argo
 echo "Bearer $(kubectl get secret argo-server.service-account-token --namespace argo -o=jsonpath='{.data.token}' | base64 --decode)"
+```
+
+### Webhook authentication
+
+```bash
+echo -n "$(kubectl get secret argo-server.service-account-token -n argo -o=jsonpath='{.data.token}' | base64 --decode)" > ./webhook-token.txt
+kubectl --namespace argo-events create secret generic my-webhook-token --from-file=my-token=./webhook-token.txt
+# Enable authSecret at the webhook event source
+kubectl --namespace argo-events apply --filename event-source.yaml
 ```

@@ -12,6 +12,9 @@ spec:
       port: "4321"
       endpoint: /webhook
       method: POST
+      authSecret:
+        name: my-webhook-token
+        key: my-token
 ---
 apiVersion: v1
 kind: Service
