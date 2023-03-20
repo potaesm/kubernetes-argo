@@ -149,7 +149,7 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 #### Generate TLS certificate
 
 ```bash
-kubectl create ns cert-manager
+kubectl create namespace cert-manager
 kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 kubectl apply --filename letsencrypt.yaml --namespace {TargetIngressNamespace}
 kubectl get secrets --namespace {TargetIngressNamespace}
@@ -163,7 +163,7 @@ kubectl --namespace {TargetIngressNamespace} get secret tls-cert-secret -ojson |
 kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
     --namespace ingress \
     --type='json' \
-    --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate={TargetIngressNamespace}/tls-cert-secret"}]'
+    --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate={TargetIngressNamespace}/tls-cert-secret"}'
 # kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
