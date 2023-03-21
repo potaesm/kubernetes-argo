@@ -34,8 +34,10 @@ spec:
                 templates:
                   - name: my-workflow
                     steps:
-                      - - name: echo-task
-                          template: template-echo
+                      - - name: echo-args-task
+                          template: template-echo-args
+                      - - name: print-env-task
+                          template: template-print-env
                       - - name: ls-task
                           template: template-ls
                       - - name: sleep-task-a
@@ -46,11 +48,20 @@ spec:
                           template: template-delay
                       - - name: sleep-task-c
                           template: template-sleep
-                  - name: template-echo
+                  - name: template-echo-args
                     container:
                       image: alpine
                       command: ["echo"]
                       args: ["Input::\n", ""]
+                  - name: template-print-env
+                    container:
+                      image: alpine
+                      command: ["printenv"]
+                      env:
+                        - name: ENV_ONE
+                          value: "true"
+                        - name: ENV_TWO
+                          value: "false"
                   - name: template-ls
                     container:
                       image: alpine
@@ -63,7 +74,7 @@ spec:
                       args: ["10"]
                   - name: template-delay
                     suspend:
-                      duration: "60s"
+                      duration: "20s"
           parameters:
             - src:
                 dependencyName: payload-from-event
