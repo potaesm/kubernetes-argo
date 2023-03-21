@@ -1,25 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Sensor
 metadata:
-  name: my-argo-workflow-sensor
+  name: my-workflow-submit-sensor
 spec:
   template:
     serviceAccountName: operate-workflow-sa
   dependencies:
     - name: payload-from-event
       eventSourceName: my-event-source
-      eventName: my-webhook-event
+      eventName: my-workflow-submit-webhook-event
   triggers:
     - template:
-        name: my-argo-workflow
+        name: my-submit-workflow
         argoWorkflow:
           operation: submit
           source:
             resource:
               apiVersion: argoproj.io/v1alpha1
               kind: Workflow
-              metadata:
-                generateName: my-parallel-workflow-
+              # metadata:
+              #   generateName: my-parallel-workflow-
               spec:
                 synchronization:
                   semaphore:
@@ -67,8 +67,40 @@ spec:
           parameters:
             - src:
                 dependencyName: payload-from-event
-                dataKey: body.message
+                dataKey: body
               dest: spec.templates.1.container.args.1
+            - src:
+                dependencyName: payload-from-event
+                dataKey: body.workflow_id
+              dest: metadata.name
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: my-workflow-terminate-sensor
+spec:
+  template:
+    serviceAccountName: operate-workflow-sa
+  dependencies:
+    - name: terminate-from-event
+      eventSourceName: my-event-source
+      eventName: my-workflow-terminate-webhook-event
+  triggers:
+    - template:
+        name: my-terminate-workflow
+        argoWorkflow:
+          operation: terminate
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              # metadata:
+              #   name: my-to-be-terminated-workflow
+          parameters:
+            - src:
+                dependencyName: terminate-from-event
+                dataKey: body.workflow_id
+              dest: metadata.name
 ---
 apiVersion: v1
 kind: ConfigMap

@@ -17,7 +17,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: my-webhook-event-source-svc
+                name: my-event-source-svc
                 port:
                   number: 4321
   tls:
