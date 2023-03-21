@@ -4,6 +4,7 @@
 
 - [Argo Workflow](https://argoproj.github.io/argo-events/sensors/triggers/argo-workflow/)
 - [Argo EventSource Services](https://argoproj.github.io/argo-events/eventsources/services/)
+- [Argo Parameterization](https://argoproj.github.io/argo-events/tutorials/02-parameterization/)
 - [Kubernetes Ingress with TLS/SSL](https://github.com/HoussemDellai/kubernetes-ingress-tls-ssl-https)
 - [SSL/TLS for your Kubernetes Cluster with Cert-Manager](https://towardsdatascience.com/ssl-tls-for-your-kubernetes-cluster-with-cert-manager-3db24338f17)
 
