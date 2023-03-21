@@ -71,7 +71,7 @@ spec:
               dest: spec.templates.1.container.args.1
             - src:
                 dependencyName: payload-from-event
-                dataKey: body.workflow_id
+                dataTemplate: "{{ .Input.body.workflow_id | lower }}"
               dest: metadata.name
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -99,7 +99,7 @@ spec:
           parameters:
             - src:
                 dependencyName: terminate-from-event
-                dataKey: body.workflow_id
+                dataTemplate: "{{ .Input.body.workflow_id | lower }}"
               dest: metadata.name
 ---
 apiVersion: v1
