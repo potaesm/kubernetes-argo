@@ -223,7 +223,7 @@ kubectl get ingress -A
 ### Enable whitelist source range
 
 ```bash
-kubectl patch svc ctx-shf-nginx-ingress-ingress-nginx-controller -p '{"spec":{"externalTrafficPolicy":"Local"}}' --namespace ingress
+kubectl patch svc my-nginx-ingress-ingress-nginx-controller -p '{"spec":{"externalTrafficPolicy":"Local"}}' --namespace ingress
 # Define whitelist source at nginx.ingress.kubernetes.io/whitelist-source-range
 kubectl apply --filename argo-events-ingress.yaml
 ```
