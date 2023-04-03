@@ -35,6 +35,7 @@
   - [Generate TLS certificates](#generate-tls-certificates)
   - [(Optional) Force Nginx ingress to use the generated certificate path](#optional-force-nginx-ingress-to-use-the-generated-certificate-path)
   - [Create argo events ingress](#create-argo-events-ingress)
+  - [Enable whitelist source range](#enable-whitelist-source-range)
 - [Authentication](#authentication)
   - [Argo server authentication](#argo-server-authentication)
     - [Change auth mode](#change-auth-mode)
@@ -178,7 +179,8 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
+    --set controller.service.externalTrafficPolicy=Local
 ```
 
 ### Check ingress availability
@@ -216,6 +218,14 @@ kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
 kubectl apply --filename argo-server-ingress.yaml
 kubectl apply --filename argo-events-ingress.yaml
 kubectl get ingress -A
+```
+
+### Enable whitelist source range
+
+```bash
+kubectl patch svc ctx-shf-nginx-ingress-ingress-nginx-controller -p '{"spec":{"externalTrafficPolicy":"Local"}}' --namespace ingress
+# Define whitelist source at nginx.ingress.kubernetes.io/whitelist-source-range
+kubectl apply --filename argo-events-ingress.yaml
 ```
 
 ## Authentication
