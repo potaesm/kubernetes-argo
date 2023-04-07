@@ -20,7 +20,7 @@ metadata:
 spec:
   secretName: tls-cert-secret
   issuerRef:
-    kind: Issuer
+    kind: ClusterIssuer # Issuer
     name: le-cluster-issuer
   dnsNames:
     - argo.cortexshiftdev.team
