@@ -16,6 +16,7 @@ kubectl delete secret $NAME_SPACE_CERTS_SECRET -n $NAME_SPACE
 CERT_MANAGER_POD_NAME=$(kubectl get pods -n cert-manager -o=jsonpath='{.items[0].metadata.name}')
 echo Pod name: $CERT_MANAGER_POD_NAME
 
+kubectl delete -f letsencrypt.yaml -n $NAME_SPACE
 kubectl apply -f letsencrypt.yaml -n $NAME_SPACE
 
 echo "Sleeping for 40 seconds to give the certificate time to generate"
