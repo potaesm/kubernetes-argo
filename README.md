@@ -194,6 +194,7 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 ### Generate TLS certificates
 
 ```bash
+# https://ikarus.sg/deploy-cert-manager-tls/
 kubectl create namespace cert-manager
 kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 kubectl apply --filename letsencrypt.yaml --namespace {OneOfTargetIngressNamespace}
