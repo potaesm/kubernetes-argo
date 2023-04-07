@@ -1,25 +1,10 @@
-# apiVersion: cert-manager.io/v1
-# kind: Issuer
-# metadata:
-#   name: le-cluster-issuer
-# spec:
-#   acme:
-#     server: https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
-#     email: suthinan.musitmani@gmail.com
-#     privateKeySecretRef:
-#       name: le-cluster-issuer-key
-#     solvers:
-#       - http01:
-#           ingress:
-#             class: nginx
-# ---
 apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+kind: ClusterIssuer # "ClusterIssuer" allows the issuer to issue certificates to all namespaces while "Issuer" only allows the issuer to issue certificates to apps within the same namespace it is defined in
 metadata:
   name: le-cluster-issuer
 spec:
   acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory # https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
     email: suthinan.musitmani@gmail.com
     privateKeySecretRef:
       name: le-cluster-issuer-key
@@ -31,7 +16,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: le-crt
+  name: le-cert
 spec:
   secretName: tls-cert-secret
   issuerRef:

@@ -196,8 +196,9 @@ kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-ngi
 ```bash
 kubectl create namespace cert-manager
 kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
-kubectl apply --filename letsencrypt.yaml --namespace {TargetIngressNamespace}
+kubectl apply --filename letsencrypt.yaml --namespace {OneOfTargetIngressNamespace}
 kubectl get secrets --namespace {TargetIngressNamespace}
+kubectl describe certificate.cert-manager.io/le-cert -n {TargetIngressNamespace}
 kubectl describe secrets tls-cert-secret --namespace {TargetIngressNamespace}
 kubectl --namespace {TargetIngressNamespace} get secret tls-cert-secret -ojson | jq -r '.data."tls.crt"' | base64 -d | openssl x509 -dates -noout -issuer
 ```
