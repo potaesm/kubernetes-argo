@@ -1,10 +1,25 @@
+# apiVersion: cert-manager.io/v1
+# kind: Issuer
+# metadata:
+#   name: le-cluster-issuer
+# spec:
+#   acme:
+#     server: https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
+#     email: suthinan.musitmani@gmail.com
+#     privateKeySecretRef:
+#       name: le-cluster-issuer-key
+#     solvers:
+#       - http01:
+#           ingress:
+#             class: nginx
+# ---
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: le-cluster-issuer
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory # https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
     email: suthinan.musitmani@gmail.com
     privateKeySecretRef:
       name: le-cluster-issuer-key

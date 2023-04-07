@@ -208,7 +208,7 @@ kubectl --namespace {TargetIngressNamespace} get secret tls-cert-secret -ojson |
 kubectl patch deployment my-nginx-ingress-ingress-nginx-controller \
     --namespace ingress \
     --type='json' \
-    --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate={TargetIngressNamespace}/tls-cert-secret"}'
+    --patch '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--default-ssl-certificate={TargetIngressNamespace}/tls-cert-secret"}]'
 # kubectl edit deployment.apps my-nginx-ingress-ingress-nginx-controller --namespace ingress
 ```
 
