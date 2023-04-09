@@ -32,6 +32,7 @@
   - [Delete the existing ingress class](#delete-the-existing-ingress-class)
   - [Install the Nginx ingress](#install-the-nginx-ingress)
   - [Check ingress availability](#check-ingress-availability)
+  - [Manually insert TLS certificates](#manually-insert-tls-certificates)
   - [Generate TLS certificates](#generate-tls-certificates)
   - [(Optional) Force Nginx ingress to use the generated certificate path](#optional-force-nginx-ingress-to-use-the-generated-certificate-path)
   - [Create argo events ingress](#create-argo-events-ingress)
@@ -189,6 +190,15 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
 kubectl get services --namespace ingress
 kubectl --namespace ingress get services -o wide -w my-nginx-ingress-ingress-nginx-controller
 # Prepare DNS record with the nginx ingress external IP
+```
+
+### Manually insert TLS certificates
+
+```bash
+kubectl create secret tls tls-cert-secret \
+--namespace {OneOfTargetIngressNamespace} \
+--key privkey.pem \
+--cert cert.pem
 ```
 
 ### Generate TLS certificates
