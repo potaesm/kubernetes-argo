@@ -31,6 +31,8 @@ spec:
                   secondsAfterSuccess: 5
                   secondsAfterFailure: 5
                 entrypoint: my-workflow
+                # imagePullSecrets:
+                #   - name: my-registry-secret
                 templates:
                   - name: my-workflow
                     steps:

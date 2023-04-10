@@ -44,6 +44,9 @@
   - [Webhook authentication](#webhook-authentication)
     - [Create the token secret](#create-the-token-secret)
     - [Apply the auth secret](#apply-the-auth-secret)
+- [Using private container registry](#using-private-container-registry)
+  - [Attach Azure Container Registry to the AKS cluster](#attach-azure-container-registry-to-the-aks-cluster)
+  - [Create registry secret](#create-registry-secret)
 
 ## Force delete namespace
 
@@ -272,4 +275,28 @@ kubectl --namespace argo-events create secret generic my-webhook-token --from-fi
 ```bash
 # Enable authSecret at the webhook event source
 kubectl --namespace argo-events apply --filename event-source.yaml
+```
+
+## Using private container registry
+
+### Attach Azure Container Registry to the AKS cluster
+
+```bash
+az aks update -n {AKSClusterName} -g {ResourceGroupName} --attach-acr {ACRName}
+# Check ACR availability
+az aks check-acr --resource-group {ResourceGroupName} --name {AKSClusterName} --acr {ACRName}.azurecr.io
+```
+
+### Create registry secret
+
+```bash
+kubectl create secret docker-registry my-registry-secret --docker-server="{ACRName}.azurecr.io" \
+--docker-username="{ACRUsername}" \
+--docker-password="{ACRPassword}" \
+--docker-email="{DockerEmail}" \
+--namespace=argo-events
+# Add secret reader role binding
+kubectl apply --filename role-binding.yaml
+# Add imagePullSecrets to the sensor
+kubectl --namespace argo-events apply --filename {SensorFileName}.yaml
 ```
