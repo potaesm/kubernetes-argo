@@ -41,7 +41,7 @@ spec:
       http:
         paths:
           - path: /argo(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific # Prefix
             backend:
               service:
                 name: argo-server
