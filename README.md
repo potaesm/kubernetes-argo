@@ -184,7 +184,8 @@ helm install my-nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
-    --set controller.service.externalTrafficPolicy=Local
+    --set controller.service.externalTrafficPolicy=Local \
+    --set controller.ingressClassResource.name=ctx-shf-nginx-ingress
 ```
 
 ### Check ingress availability
