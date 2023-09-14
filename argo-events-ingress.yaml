@@ -15,7 +15,7 @@ spec:
       http:
         paths:
           - path: /events(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific # Prefix
             backend:
               service:
                 name: my-event-source-svc
