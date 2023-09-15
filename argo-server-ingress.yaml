@@ -37,7 +37,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: argo.cortexshiftdev.team # myargoserver.<ingress-nginx-controller-external-ip>.nip.io
+    - host: argo.cortexshiftdev.team # <ingress-nginx-controller-external-ip>.nip.io # disable attribute for no tls 
       http:
         paths:
           - path: /argo(/|$)(.*)
