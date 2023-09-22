@@ -70,6 +70,9 @@ kubectl apply --namespace argo -f https://github.com/argoproj/argo-workflows/rel
 # kubectl delete --namespace argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.5/install.yaml
 kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["server", "--auth-mode=server"]}]'
 kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/env", "value": [{"name": "BASE_HREF", "value": "/argo/"}]}]'
+# For no TLS
+kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/0", "value": "--secure=false"}]'
+kubectl patch deployment argo-server --namespace argo --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/readinessProbe/httpGet/scheme", "value": "HTTP"}]'
 ```
 
 #### Argo server port forward
