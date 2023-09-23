@@ -54,4 +54,13 @@ spec:
 
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+# kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'
+```
+
+## Argo CD CLI
+
+- [Installation](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
+
+```bash
+argocd login {ARGOCD_FQDN} --username admin --password {ARGO_PASSWORD} --skip-test-tls --grpc-web
 ```
