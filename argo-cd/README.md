@@ -22,32 +22,13 @@ helm install main-nginx-ingress ingress-nginx/ingress-nginx \
 
 kubectl patch deployment argocd-server --namespace argocd --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/1", "value": "--insecure"}]'
 
-vi argocd-ingress.yaml
+kubectl apply -f argocd-ingress.yaml
+```
 
-###
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: argocd-ingress
-  namespace: argocd
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  ingressClassName: nginx
-  rules:
-    - http:
-        paths:
-          - path: /argocd(/|$)(.*)
-            pathType: ImplementationSpecific # Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
----
-###
+## Sync
+
+```bash
+kubectl apply -f argocd-project-sync.yaml
 ```
 
 ## Credentials
@@ -63,4 +44,14 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ```bash
 argocd login {ARGOCD_FQDN} --username admin --password {ARGO_PASSWORD} --skip-test-tls --grpc-web
+```
+
+## Image pull secret
+
+```bash
+kubectl create secret docker-registry my-registry-secret --docker-server="docker.io" \
+  --docker-username="{DOCKER_USERNAME}" \
+  --docker-password="{DOCKER_PASSWORD}" \
+  --docker-email="docker@email.com" \
+  --namespace=argocd
 ```
