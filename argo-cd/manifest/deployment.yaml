@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: nest-app
-          image: potaesm/nest-app:build-52
+          image: potaesm/nest-app:build-54
           ports:
             - containerPort: 80
