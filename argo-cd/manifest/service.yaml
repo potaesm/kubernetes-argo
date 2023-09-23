@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-service
+  name: nest-app-svc
 spec:
   selector:
-    app: myapp
+    app: nest-app
 
   type: LoadBalancer
   ports:
     - port: 80
       protocol: TCP
-      targetPort: 80
+      targetPort: 3000
