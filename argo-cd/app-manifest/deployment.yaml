@@ -24,7 +24,7 @@ spec:
         - name: potaesm-registry-secret
       containers:
         - name: nest-app
-          image: potaesm/nest-app:build-342
+          image: potaesm/nest-app:build-344
           ports:
             - containerPort: 3000
           resources:
