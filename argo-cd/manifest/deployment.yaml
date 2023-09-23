@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nest-app
-          image: potaesm/nest-app:build-279
+          image: potaesm/nest-app:build-281
           ports:
             - containerPort: 3000
           livenessProbe:
