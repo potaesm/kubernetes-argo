@@ -1,0 +1,45 @@
+version: 2.1
+
+jobs:
+  build_and_push:
+    docker:
+      - image: cimg/node:20.3.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and push image
+          command: |
+            version="build-$CIRCLE_BUILD_NUM"
+            echo $version
+            docker build -t potaesm/nest-app:$version -f ./nest-app/Dockerfile ./nest-app
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push potaesm/nest-app:$version
+
+  Update_menifest:
+    docker:
+      - image: cimg/base:2023.06
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Update manifest file
+          command: |
+            TAG=$CIRCLE_BUILD_NUM
+            ((TAG--))
+            git clone https://github.com/potaesm/kubernetes-argo.git
+            git config --global user.email "suthinan.musitmani@gmail.com"
+            git config --global user.name "potaesm"
+            cd kubernetes-argo
+            sed -i "s/build-.*/build-$TAG/g" argo-cd/manifest/deployment.yaml
+            git add .
+            git commit -m "build with image tag of build-$TAG"
+            git config credential.helper 'cache --timeout=120'
+            git push -q https://$GITHUB_PERSONAL_TOKEN@github.com/potaesm/kubernetes-argo.git main
+workflows:
+  GitOpsflow:
+    jobs:
+      - build_and_push
+      - Update_menifest:
+          requires:
+            - build_and_push
