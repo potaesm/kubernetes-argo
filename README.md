@@ -47,6 +47,7 @@
 - [Using private container registry](#using-private-container-registry)
   - [Attach Azure Container Registry to the AKS cluster](#attach-azure-container-registry-to-the-aks-cluster)
   - [Create registry secret](#create-registry-secret)
+- [Argo CD](./argo-cd.md)
 
 ## Force delete namespace
 
