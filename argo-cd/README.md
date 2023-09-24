@@ -33,23 +33,66 @@ kubectl apply -f argocd-project-sync.yaml
 
 ## Credentials
 
-```bash
-# admin password
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-# kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'
+- Get admin password
 
-# add new user
-kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yml
-vi argocd-cm.yml
----
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
+
+- Add new user
+
+```bash
+kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yml && vi argocd-cm.yml
+###
 apiVersion: v1
 data:
   accounts.{NEW_USERNAME}: apiKey, login
 ...
----
+###
 kubectl apply -f argocd-cm.yml
 argocd account update-password --account {NEW_USERNAME} --new-password {NEW_PASSWORD}
+```
+
+- List accounts
+
+```bash
 argocd account list
+```
+
+- Update the RBAC
+
+```bash
+kubectl get configmap argocd-rbac-cm -n argocd -o yaml > argocd-rbac-cm.yml && vi argocd-rbac-cm.yml
+###
+apiVersion: v1
+data:
+  policy.csv: |
+    p, role:devops, applications, *, *, allow
+    p, role:developers, applications, *, *, allow
+    p, role:devops, clusters, get, *, allow
+    p, role:devops, repositories, get, *, allow
+    p, role:devops, repositories, create, *, allow
+    p, role:devops, repositories, update, *, allow
+    p, role:devops, repositories, delete, *, allow
+    p, role:devops, gpgkeys, get, *, allow
+    g, {NEW_USERNAME}, role:admin
+...
+###
+kubectl apply -f argocd-rbac-cm.yml
+```
+
+- Disable admin
+
+```bash
+kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yml && vi argocd-cm.yml
+###
+apiVersion: v1
+data:
+  ...
+  admin.enabled: "false"
+...
+###
+kubectl apply -f argocd-cm.yml
 ```
 
 ## Argo CD CLI
