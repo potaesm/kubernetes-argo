@@ -34,8 +34,22 @@ kubectl apply -f argocd-project-sync.yaml
 ## Credentials
 
 ```bash
+# admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 # kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'
+
+# add new user
+kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yml
+vi argocd-cm.yml
+---
+apiVersion: v1
+data:
+  accounts.{NEW_USERNAME}: apiKey, login
+...
+---
+kubectl apply -f argocd-cm.yml
+argocd account update-password --account {NEW_USERNAME} --new-password {NEW_PASSWORD}
+argocd account list
 ```
 
 ## Argo CD CLI
